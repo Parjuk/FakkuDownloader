@@ -6,7 +6,8 @@ Download From fakku via command line
 # Current Feature :
  - Download from Fakku.net
  - Show Downloaded
- 
+ - Downloaded manga stored in folder downloads
+
 # TODO :
  - search manga feature
  - remove downloaded manga
