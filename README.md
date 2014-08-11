@@ -17,7 +17,7 @@ Download From fakku via command line
  - Download and Install NodeJS
  - Download ( or clone ) this 
  - open Downloaded folder in command line ( Shift + right click -> Open Command Window here, for windows user )
- - run node install and wait to install all dependency
+ - run "node install" without (") and wait to install all dependency
  - then run "node app.js {command_here}" without (")
  
 # Current Command
