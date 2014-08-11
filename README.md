@@ -22,4 +22,6 @@ Download From fakku via command line
  
 # Current Command
  - news : get all manga from Fakku and you can choose what manga you want to download
+   ![node app.js news](http://zippy.gfycat.com/WideNervousGerbil.gif)
+ 
  - --search=keyword or -S keyword : to search all downloaded manga ( if keyword leave blank, it will list all downloaded mangas)
