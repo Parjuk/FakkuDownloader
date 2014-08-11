@@ -1,0 +1,25 @@
+{
+  "name": "FakkuCLI",
+  "version": "0.0.1",
+  "description": "Browse and Download Manga from Fakku via Command line",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "h"
+  ],
+  "author": "GantengMaksimal",
+  "license": "ISC",
+  "dependencies": {
+    "change-case": "^2.1.1",
+    "colors": "^0.6.2",
+    "fs-extra": "^0.10.0",
+    "inquirer": "^0.6.0",
+    "lodash": "^2.4.1",
+    "minimist": "^0.2.0",
+    "node-dir": "^0.1.5",
+    "progress": "^1.1.7",
+    "request": "^2.40.0"
+  }
+}
