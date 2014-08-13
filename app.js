@@ -7,8 +7,9 @@ var path		= require('path')
 var dir			= require('node-dir')
 var color		= require('colors');
 var progress	= require('progress')
-var inquirer	= require('inquirer')
+var inquirer	= require('inquirer-longer')
 var changeCase	= require('change-case');
+var utils		= require('./utils')
 var args		= require('minimist')(process.argv.slice(2));
 
 var api			= 'https://api.fakku.net'
@@ -41,7 +42,7 @@ if(args.news)
 	console.log()
 	console.log('Gathering Information from %s'.info, api)
 
-	request(api + '/index', function(err, res, body)
+	request(api + '/index/page/2', function(err, res, body)
 	{
 		if(err)
 		{
@@ -49,37 +50,12 @@ if(args.news)
 		}
 
 		console.log('Information Received'.info)
-		// console.log('Building User Interface'.info)
-
+		
 		var data = JSON.parse(body)
-
-		var bar = new progress('Building User Interface [:bar] :percent', 
-		{
-			complete: '=',
-			incomplete: ' ',
-			width: 50,
-			total: __.size(data.index)
-
-		})
 
 		var i = 1;
 
-		var choices = [];
-
-		__.each(data.index, function(value, key, list)
-		{
-			bar.tick();
-
-			var temp = {};
-
-			temp.name = '['+ changeCase.pascalCase(value.content_language) +'] ' + value.content_name
-
-			temp.value = value;
-
-			choices.push(temp)
-
-			i++;
-		})
+		var choices = utils.buildChoiseManga(data.index)
 
 		inquirer.prompt([{
 		
@@ -90,22 +66,9 @@ if(args.news)
 
 		}], function(answers)
 		{
-			var toDownload = [];
+			var toDownload = utils.buildChoiseMangaToDownload(answers.manga)
 
-			__.each(answers.manga, function(value, key, list)
-			{
-				console.log('┬─' + value.content_name)
-				console.log('├────language : ' + changeCase.pascalCase(value.content_language))
-				console.log('├────Caregory : ' + changeCase.pascalCase(value.content_category))
-				console.log('├────Total Pages : ' + value.content_pages)
-				console.log('└────tags : ' + __.map(value.content_tags, function(value){ return changeCase.pascalCase(value.attribute) }))
-				console.log('')
-
-				toDownload.push({
-					name: value.content_name,
-					value: value
-				})
-			})
+			utils.printMangaInfo(answers.manga);
 
 			inquirer.prompt([{
 
@@ -116,54 +79,7 @@ if(args.news)
 
 			}], function(answers)
 			{
-				__.each(answers.download, function(value, key, lists)
-				{
-					console.log('Getting Download Information for %s', value.content_name)
-
-					request(api + value.content_url.replace('http://www.fakku.net', '') + '/read', function(err, res, body)
-					{
-						if(err)
-						{
-							console.log(err)
-
-							return false;
-						}
-
-						var data = JSON.parse(body)
-
-						fs.ensureDir(__dirname + '/downloads/' + value.content_name);
-
-						var que = 1;
-
-						var bar = new progress('Downloading '+value.content_name+' [:bar] :percent', 
-						{
-							complete: '=',
-							incomplete: ' ',
-							width: 50,
-							total: value.content_pages
-
-						})
-
-						__.each(data.pages, function(_value, _key, _lists)
-						{
-							request(_value.image, function(err, res, body)
-							{
-								if(err)
-								{
-									console.log(err)
-
-									return false;
-								}
-
-								bar.tick();
-
-							}).pipe(fs.createWriteStream(__dirname + '/downloads/' + value.content_name + '/' + que + '.jpg'))
-
-							que++;
-						})
-
-					})
-				})
+				utils.downloadBundle(answers.download);
 			})
 		})
 
@@ -211,4 +127,91 @@ if(args.news)
 		})
 	})
 
+} else if (args.tags || args.T) {
+
+	var query = args.tags || args.T;
+
+	if(typeof query == 'boolean' && query)
+	{
+		query = '*';
+	}
+
+	console.log('requesting information from %s'.info, api + '/tags')
+
+	request(api + '/tags', function(err, res, body)
+	{
+		if(err)
+		{
+			console.log(err)
+
+			return false;
+		}
+
+		var data = JSON.parse(body);
+
+		var choices = [];
+
+		__.each(data.tags, function(value, key, lists)
+		{
+			var temp = {};
+
+			temp.name = value.tag_name
+
+			temp.value = value
+
+			choices.push(temp)
+		})
+
+		inquirer.prompt([{
+
+			type: 'list',
+			message: 'Filter Manga by tags',
+			name: 'tags',
+			choices: choices
+
+		}], function(answers){
+
+			console.log('requesting from %s with tags %s'.info, api, answers.tags.tag_name)
+
+			request(api + '/tags/' + answers.tags.tag_name.toString().toLowerCase(), function(err, res, body)
+			{
+				if(err)
+				{
+					console.log(err)
+
+					return false;
+				}
+
+				var data = JSON.parse(body);
+
+				var choices = utils.buildChoiseManga(data.content)
+
+				inquirer.prompt([{
+
+					type: 'checkbox',
+					message: 'Manga(s) with tags ' + answers.tags.tag_name,
+					name: 'manga',
+					choices: choices
+
+				}], function(answers)
+				{
+					utils.printMangaInfo(answers.manga);
+
+					var toDownload = utils.buildChoiseMangaToDownload(answers.manga)
+
+					inquirer.prompt([{
+
+						type: 'checkbox',
+						message: 'Select Manga(s) to Download',
+						name: 'download',
+						choices: toDownload
+
+					}], function(answers)
+					{
+						utils.downloadBundle(answers.download)
+					})
+				})
+			})
+		})
+	})
 }
