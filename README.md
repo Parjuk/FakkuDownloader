@@ -3,7 +3,7 @@ FakkuDownloader
 
 Download From fakku via command line
 
-# Current Feature :
+# Current Feature
  - Download from Fakku.net
  - Show Downloaded
  - Downloaded manga stored in folder downloads
@@ -17,9 +17,10 @@ Download From fakku via command line
    - add news command, search newest manga
    - add --search, search downloaded manga
 
-# TODO :
+# TODO
  - change current --search command to --downloaded
  - search manga feature ( --search )
+ - add info for downloaded manga ( artist, translator, total pages, tags, etc )
  - remove downloaded manga
  - add more features
  
