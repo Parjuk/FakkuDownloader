@@ -3,13 +3,24 @@ FakkuDownloader
 
 Download From fakku via command line
 
-# Current Feature :
+# Current Feature
  - Download from Fakku.net
  - Show Downloaded
  - Downloaded manga stored in folder downloads
 
-# TODO :
- - search manga feature
+# Change Logs
+ - v0.2
+   - add --tags command, search manga by tags
+ 
+ - v0.1
+   - initial release
+   - add news command, search newest manga
+   - add --search, search downloaded manga
+
+# TODO
+ - change current --search command to --downloaded
+ - search manga feature ( --search )
+ - add info for downloaded manga ( artist, translator, total pages, tags, etc )
  - remove downloaded manga
  - add more features
  
@@ -26,3 +37,5 @@ Download From fakku via command line
  
  - --search=keyword or -S keyword : to search all downloaded manga ( if keyword leave blank, it will list all downloaded mangas)
    ![node app.js -S keyword](http://zippy.gfycat.com/ShortCreepyGoat.gif)
+
+ - --tags or -T : search manga based on choosen tags
