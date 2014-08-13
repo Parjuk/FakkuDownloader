@@ -18,7 +18,7 @@ Download From fakku via command line
    - add --search, search downloaded manga
 
 # TODO :
- - change current --search command --downloaded
+ - change current --search command to --downloaded
  - search manga feature ( --search )
  - remove downloaded manga
  - add more features
