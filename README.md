@@ -9,6 +9,10 @@ Download From fakku via command line
  - Downloaded manga stored in folder downloads
 
 # Change Logs
+ - v0.3
+   - change --search command from search downloaded manga to search from fakku
+   - add pagination
+
  - v0.2
    - add --tags command, search manga by tags
  
@@ -18,8 +22,7 @@ Download From fakku via command line
    - add --search, search downloaded manga
 
 # TODO
- - change current --search command to --downloaded
- - search manga feature ( --search )
+ - give proper instruction to install and use this application
  - add info for downloaded manga ( artist, translator, total pages, tags, etc )
  - remove downloaded manga
  - add more features
@@ -32,10 +35,8 @@ Download From fakku via command line
  - then run "node app.js {command_here}" without (")
  
 # Current Command
- - news : get all manga from Fakku and you can choose what manga you want to download
-   ![node app.js news](http://fat.gfycat.com/GenerousWelcomeEarthworm.gif)
+ - --news : get all manga from Fakku and you can choose what manga you want to download
  
- - --search=keyword or -S keyword : to search all downloaded manga ( if keyword leave blank, it will list all downloaded mangas)
-   ![node app.js -S keyword](http://zippy.gfycat.com/ShortCreepyGoat.gif)
+ - --search="keyword" or -S "keyword" : search manga from Fakku
 
  - --tags or -T : search manga based on choosen tags
