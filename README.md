@@ -9,6 +9,9 @@ Download From fakku via command line
  - Downloaded manga stored in folder downloads
 
 # Change Logs
+ - v0.3.1
+   - fix crash on pagination
+   
  - v0.3
    - change --search command from search downloaded manga to search from fakku
    - add pagination
