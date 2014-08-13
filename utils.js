@@ -176,22 +176,32 @@ utils.getNewest = function(pages, prevMangas)
 		{
 			if(__.indexOf(answers.manga, 'nextPage') >= 0)
 			{
-				utils.getNewest(pages + 1, answers.manga)
+				var withoutNext = __.without(answers.manga, 'nextPage')
+
+				prevMangas = __.without(prevMangas, 'nextPage')
+
+				__.each(withoutNext, function(value, key, lists)
+				{
+					prevMangas.push(value);
+				})				
+
+				utils.getNewest(pages + 1, prevMangas)
 
 				return false;
 			}
 
 			var withoutNext = __.without(answers.manga, 'nextPage')
+
 			prevMangas = __.without(prevMangas, 'nextPage')
 
-			__.each(prevMangas, function(value, key, lists)
+			__.each(withoutNext, function(value, key, lists)
 			{
-				withoutNext.push(value);
+				prevMangas.push(value);
 			})
 
-			utils.printMangaInfo(withoutNext);
+			utils.printMangaInfo(prevMangas);
 
-			var toDownload = utils.buildChoiseMangaToDownload(withoutNext)
+			var toDownload = utils.buildChoiseMangaToDownload(prevMangas)
 
 			inquirer.prompt([{
 
@@ -239,7 +249,16 @@ utils.getByTags = function(tag, pages, prevMangas)
 		{
 			if(__.indexOf(answers.manga, 'nextPage') >= 0)
 			{
-				utils.getByTags(tag, pages + 1, answers.manga)
+				var withoutNext = __.without(answers.manga, 'nextPage')
+
+				prevMangas = __.without(prevMangas, 'nextPage')
+
+				__.each(withoutNext, function(value, key, lists)
+				{
+					prevMangas.push(value);
+				})				
+
+				utils.getNewest(pages + 1, prevMangas)
 
 				return false;
 			}
@@ -301,7 +320,16 @@ utils.searchManga = function(query, pages, prevMangas)
 		{
 			if(__.indexOf(answers.manga, 'nextPage') >= 0)
 			{
-				utils.searchManga(query, pages + 1, answers.manga)
+				var withoutNext = __.without(answers.manga, 'nextPage')
+
+				prevMangas = __.without(prevMangas, 'nextPage')
+
+				__.each(withoutNext, function(value, key, lists)
+				{
+					prevMangas.push(value);
+				})				
+
+				utils.getNewest(pages + 1, prevMangas)
 
 				return false;
 			}
