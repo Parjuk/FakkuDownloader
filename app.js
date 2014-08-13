@@ -39,55 +39,18 @@ if(args._)
 
 if(args.news)
 {
-	console.log()
-	console.log('Gathering Information from %s'.info, api)
+	var page = 1;
 
-	request(api + '/index/page/2', function(err, res, body)
+	if(args.page && typeof args.page !== 'boolean')
 	{
-		if(err)
-		{
-			throw err;
-		}
+		page = args.page;
+	}
 
-		console.log('Information Received'.info)
-		
-		var data = JSON.parse(body)
+	utils.getNewest(page);
 
-		var i = 1;
+} else if (args.dowmloaded || args.D) {
 
-		var choices = utils.buildChoiseManga(data.index)
-
-		inquirer.prompt([{
-		
-			type: 'checkbox',
-			message: 'Newest Manga',
-			name: 'manga',
-			choices: choices
-
-		}], function(answers)
-		{
-			var toDownload = utils.buildChoiseMangaToDownload(answers.manga)
-
-			utils.printMangaInfo(answers.manga);
-
-			inquirer.prompt([{
-
-				type: 'checkbox',
-				message: 'Select Manga to Download',
-				name: 'download',
-				choices: toDownload
-
-			}], function(answers)
-			{
-				utils.downloadBundle(answers.download);
-			})
-		})
-
-	})
-
-} else if (args.search || args.S) {
-
-	var query = args.search || args.S;
+	var query = args.dowmloaded || args.D;
 
 	if(typeof query == 'boolean' && query)
 	{
@@ -171,47 +134,32 @@ if(args.news)
 
 		}], function(answers){
 
-			console.log('requesting from %s with tags %s'.info, api, answers.tags.tag_name)
+			var page = 1;
 
-			request(api + '/tags/' + answers.tags.tag_name.toString().toLowerCase(), function(err, res, body)
+			if(args.page && typeof args.page !== 'boolean')
 			{
-				if(err)
-				{
-					console.log(err)
+				page = args.page;
+			}
 
-					return false;
-				}
-
-				var data = JSON.parse(body);
-
-				var choices = utils.buildChoiseManga(data.content)
-
-				inquirer.prompt([{
-
-					type: 'checkbox',
-					message: 'Manga(s) with tags ' + answers.tags.tag_name,
-					name: 'manga',
-					choices: choices
-
-				}], function(answers)
-				{
-					utils.printMangaInfo(answers.manga);
-
-					var toDownload = utils.buildChoiseMangaToDownload(answers.manga)
-
-					inquirer.prompt([{
-
-						type: 'checkbox',
-						message: 'Select Manga(s) to Download',
-						name: 'download',
-						choices: toDownload
-
-					}], function(answers)
-					{
-						utils.downloadBundle(answers.download)
-					})
-				})
-			})
+			utils.getByTags(answers.tags.tag_name.toString().toLowerCase(), page);
 		})
 	})
+
+} else if (args.search || args.S) {
+
+	var query = args.search || args.S;
+
+	if(typeof query == 'boolean' && query)
+	{
+		query = '';
+	}
+
+	var page = 1;
+
+	if(args.page && typeof args.page !== 'boolean')
+	{
+		page = args.page;
+	}
+
+	utils.searchManga(query, page);
 }

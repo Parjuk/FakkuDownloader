@@ -38,7 +38,7 @@ utils.buildChoiseManga = function(data)
 	{
 		var temp = {};
 
-		temp.name = i +') ['+ changeCase.pascalCase(value.content_language) +'] ' + value.content_name
+		temp.name = '('+ i +') ['+ changeCase.pascalCase(value.content_language) +'] ' + value.content_name + ' ('+ i +')'
 
 		temp.value = value;
 
@@ -54,12 +54,19 @@ utils.printMangaInfo = function(data)
 {
 	__.each(data, function(value, key, lists)
 	{
+		if(!value.content_name)
+		{
+			return;
+		}
+
 		console.log('')
 		console.log('┬─' + value.content_name)
 		console.log('├────language : ' + changeCase.pascalCase(value.content_language))
 		console.log('├────Caregory : ' + changeCase.pascalCase(value.content_category))
 		console.log('├────Total Pages : ' + value.content_pages)
-		console.log('└────tags : ' + __.map(value.content_tags, function(value){ return changeCase.pascalCase(value.attribute) }))
+		console.log('├────Artist : ' + __.map(value.content_artists, function(value){ return changeCase.pascalCase(value.attribute) }))
+		console.log('├────Translator : ' + __.map(value.content_translators, function(value){ return changeCase.pascalCase(value.attribute) }))
+		console.log('└────Tags : ' + __.map(value.content_tags, function(value){ return changeCase.pascalCase(value.attribute) }))
 		console.log('')
 
 	})
@@ -133,6 +140,195 @@ utils.downloadBundle = function(data)
 				que++;
 			})
 
+		})
+	})
+}
+
+utils.getNewest = function(pages, prevMangas)
+{
+	console.log('Gathering Information from %s'.info, api)
+
+	request(api + '/index/page/' + pages , function(err, res, body)
+	{
+		if(err)
+		{
+			throw err;
+		}
+
+		console.log('Information Received'.info)
+		
+		var data = JSON.parse(body)
+
+		var i = 1;
+
+		var choices = utils.buildChoiseManga(data.index)
+
+		choices.push({name: 'Next Page',value: 'nextPage'});
+
+		inquirer.prompt([{
+		
+			type: 'checkbox',
+			message: 'Newest Manga',
+			name: 'manga',
+			choices: choices
+
+		}], function(answers)
+		{
+			if(__.indexOf(answers.manga, 'nextPage') >= 0)
+			{
+				utils.getNewest(pages + 1, answers.manga)
+
+				return false;
+			}
+
+			var withoutNext = __.without(answers.manga, 'nextPage')
+			prevMangas = __.without(prevMangas, 'nextPage')
+
+			__.each(prevMangas, function(value, key, lists)
+			{
+				withoutNext.push(value);
+			})
+
+			utils.printMangaInfo(withoutNext);
+
+			var toDownload = utils.buildChoiseMangaToDownload(withoutNext)
+
+			inquirer.prompt([{
+
+				type: 'checkbox',
+				message: 'Select Manga to Download',
+				name: 'download',
+				choices: toDownload
+
+			}], function(answers)
+			{
+				utils.downloadBundle(answers.download);
+			})
+		})
+
+	})
+}
+
+utils.getByTags = function(tag, pages, prevMangas)
+{
+	console.log('requesting from %s with tags %s'.info, api, tag)
+
+	request(api + '/tags/' + tag + '/page/' + pages, function(err, res, body)
+	{
+		if(err)
+		{
+			console.log(err)
+
+			return false;
+		}
+
+		var data = JSON.parse(body);
+
+		var choices = utils.buildChoiseManga(data.content)
+
+		choices.push({name: 'Next Page',value: 'nextPage'});
+
+		inquirer.prompt([{
+
+			type: 'checkbox',
+			message: 'Manga(s) with tags ' + tag,
+			name: 'manga',
+			choices: choices
+
+		}], function(answers)
+		{
+			if(__.indexOf(answers.manga, 'nextPage') >= 0)
+			{
+				utils.getByTags(tag, pages + 1, answers.manga)
+
+				return false;
+			}
+
+			var withoutNext = __.without(answers.manga, 'nextPage')
+			prevMangas = __.without(prevMangas, 'nextPage')
+
+			__.each(prevMangas, function(value, key, lists)
+			{
+				withoutNext.push(value);
+			})
+
+			utils.printMangaInfo(withoutNext);
+
+			var toDownload = utils.buildChoiseMangaToDownload(withoutNext)
+
+			inquirer.prompt([{
+
+				type: 'checkbox',
+				message: 'Select Manga(s) to Download',
+				name: 'download',
+				choices: toDownload
+
+			}], function(answers)
+			{
+				utils.downloadBundle(answers.download)
+			})
+		})
+	})
+}
+
+utils.searchManga = function(query, pages, prevMangas)
+{
+	console.log('searching with "%s" keyword'.info, query)
+
+	request(api + '/search/' + query + '/page/' + pages, function(err, res, body)
+	{
+		if(err)
+		{
+			console.log(err)
+
+			return false;
+		}
+
+		var data = JSON.parse(body)
+
+		var choices = utils.buildChoiseManga(data.content)
+
+		choices.push({name: 'Next Page',value: 'nextPage'});
+
+		inquirer.prompt([{
+
+			type: 'checkbox',
+			message: 'Search Result #' + pages,
+			name: 'manga',
+			choices: choices
+
+		}], function(answers)
+		{
+			if(__.indexOf(answers.manga, 'nextPage') >= 0)
+			{
+				utils.searchManga(query, pages + 1, answers.manga)
+
+				return false;
+			}
+
+			var withoutNext = __.without(answers.manga, 'nextPage')
+			prevMangas = __.without(prevMangas, 'nextPage')
+
+			__.each(prevMangas, function(value, key, lists)
+			{
+				withoutNext.push(value);
+			})
+
+			utils.printMangaInfo(withoutNext)
+
+			var toDownload = utils.buildChoiseMangaToDownload(withoutNext)
+
+			inquirer.prompt([{
+
+				type: 'checkbox',
+				message: 'Select Manga to Download',
+				name: 'download',
+				choices: toDownload
+
+			}], function(answers)
+			{
+				utils.downloadBundle(answers.download)
+			})
 		})
 	})
 }
