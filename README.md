@@ -9,6 +9,10 @@ Download From fakku via command line
  - Downloaded manga stored in folder downloads
 
 # Change Logs
+ - v0.4
+   - fix pagination bug
+   - add --build command
+
  - v0.3.1
    - fix crash on pagination
    
@@ -26,6 +30,7 @@ Download From fakku via command line
 
 # TODO
  - give proper instruction to install and use this application
+ - add option for --build command, so you can choose what manga you want to build into .cbr
  - add info for downloaded manga ( artist, translator, total pages, tags, etc )
  - remove downloaded manga
  - add more features
@@ -43,3 +48,6 @@ Download From fakku via command line
  - --search="keyword" or -S "keyword" : search manga from Fakku
 
  - --tags or -T : search manga based on choosen tags
+ 
+ - --build or -B : create .cbr file from all downloaded manga in builds folder
+ 
