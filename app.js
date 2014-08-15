@@ -3,6 +3,7 @@ var http		= require('http')
 var https		= require('https')
 var request		= require('request')
 var fs			= require('fs-extra')
+var quefs		= require('graceful-fs')
 var path		= require('path')
 var dir			= require('node-dir')
 var color		= require('colors');
@@ -10,6 +11,8 @@ var progress	= require('progress')
 var inquirer	= require('inquirer-longer')
 var changeCase	= require('change-case');
 var utils		= require('./utils')
+var async		= require('async')
+var archiver	= require('archiver')
 var args		= require('minimist')(process.argv.slice(2));
 
 var api			= 'https://api.fakku.net'
@@ -162,4 +165,68 @@ if(args.news)
 	}
 
 	utils.searchManga(query, page);
+
+} else if (args.build || args.B) {
+
+	fs.ensureDir(__dirname + '/builds');
+
+	var buildPath = __dirname + '/builds/'
+
+	var downloadPath = __dirname + '/downloads/'
+
+	var que = [];
+
+	var i = 1;
+
+	fs.readdir(__dirname + '/downloads', function(err, data)
+	{
+		if(err)
+		{
+			console.log(err);
+
+			return false
+		}
+
+		__.each(data, function(mangaName, key, lists)
+		{
+		
+			que.push(function(callback)
+			{
+				// console.log('Creating %s.cbr'.info, mangaName)
+
+				var zip = archiver('zip')
+
+				var output = quefs.createWriteStream(buildPath + mangaName + '.cbr');
+
+				output.on('close', function() 
+				{
+					// console.log(zip.pointer() + ' total bytes');
+					// console.log('archiver has been finalized and the output file descriptor has closed.');
+					console.log('%s.cbr Created!'.info, mangaName)
+					callback(null, i)
+				});
+
+				zip.on('error', function(err) 
+				{
+					throw err;
+				});
+
+				zip.pipe(output);
+
+				zip.bulk([
+					{ 
+						expand: true,
+						cwd: downloadPath + mangaName,
+						src: ['**']
+					}
+				])
+
+				zip.finalize();
+			})
+
+			i++;	
+		})
+
+		async.series(que);
+	})
 }

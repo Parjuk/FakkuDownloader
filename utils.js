@@ -258,7 +258,7 @@ utils.getByTags = function(tag, pages, prevMangas)
 					prevMangas.push(value);
 				})				
 
-				utils.getNewest(pages + 1, prevMangas)
+				utils.getByTags(pages + 1, prevMangas)
 
 				return false;
 			}
@@ -329,7 +329,7 @@ utils.searchManga = function(query, pages, prevMangas)
 					prevMangas.push(value);
 				})				
 
-				utils.getNewest(pages + 1, prevMangas)
+				utils.searchManga(query, pages + 1, prevMangas)
 
 				return false;
 			}
