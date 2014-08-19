@@ -78,6 +78,8 @@ utils.buildChoiseMangaToDownload = function(data)
 {
 	var choices = [];
 
+	choices.push({name:'all', value:'all'})
+
 	__.each(data, function(value, key, lists)
 	{
 		var temp = {};
@@ -212,7 +214,14 @@ utils.getNewest = function(pages, prevMangas)
 
 			}], function(answers)
 			{
-				utils.downloadBundle(answers.download);
+				if(__.indexOf(answers.download, 'all') >= 0)
+				{
+					utils.downloadBundle(withoutNext)
+
+				} else {
+
+					utils.downloadBundle(answers.download)
+				}
 			})
 		})
 
@@ -284,7 +293,14 @@ utils.getByTags = function(tag, pages, prevMangas)
 
 			}], function(answers)
 			{
-				utils.downloadBundle(answers.download)
+				if(__.indexOf(answers.download, 'all') >= 0)
+				{
+					utils.downloadBundle(withoutNext)
+
+				} else {
+
+					utils.downloadBundle(answers.download)
+				}
 			})
 		})
 	})
@@ -355,7 +371,14 @@ utils.searchManga = function(query, pages, prevMangas)
 
 			}], function(answers)
 			{
-				utils.downloadBundle(answers.download)
+				if(__.indexOf(answers.download, 'all') >= 0)
+				{
+					utils.downloadBundle(withoutNext)
+
+				} else {
+
+					utils.downloadBundle(answers.download)
+				}
 			})
 		})
 	})
