@@ -228,6 +228,50 @@ utils.getNewest = function(pages, prevMangas)
 	})
 }
 
+utils.initGetByTag = function()
+{
+	console.log('requesting information from %s'.info, api + '/tags')
+
+	request(api + '/tags', function(err, res, body)
+	{
+		if(err)
+		{
+			console.log(err)
+
+			return false;
+		}
+
+		var data = JSON.parse(body);
+
+		var choices = [];
+
+		__.each(data.tags, function(value, key, lists)
+		{
+			var temp = {};
+
+			temp.name = value.tag_name
+
+			temp.value = value
+
+			choices.push(temp)
+		})
+
+		inquirer.prompt([{
+
+			type: 'list',
+			message: 'Filter Manga by tags',
+			name: 'tags',
+			choices: choices
+
+		}], function(answers){
+
+			var page = 1;
+
+			utils.getByTags(answers.tags.tag_name.toString().toLowerCase(), page);
+		})
+	})
+}
+
 utils.getByTags = function(tag, pages, prevMangas)
 {
 	console.log('requesting from %s with tags %s'.info, api, tag)
@@ -267,7 +311,7 @@ utils.getByTags = function(tag, pages, prevMangas)
 					prevMangas.push(value);
 				})				
 
-				utils.getByTags(pages + 1, prevMangas)
+				utils.getByTags(tag.toString().toLowerCase(), pages + 1, prevMangas)
 
 				return false;
 			}
@@ -306,6 +350,56 @@ utils.getByTags = function(tag, pages, prevMangas)
 	})
 }
 
+utils.mainMenu = function(welcomeMessage)
+{
+	if (welcomeMessage) console.log('')
+	if (welcomeMessage) console.log('=============== Welcome To ================')
+	if (welcomeMessage) console.log('========= Fakku Downloader v0.4.1 =========')
+	console.log('')
+
+	inquirer.prompt([{
+
+		type: 'list',
+		name: 'mainMenu',
+		message: 'Main Menu',
+		choices: [	{name: 'Newest on Fakku', value: 1}, 
+				  	{name: 'Filter By Tags', value: 2}, 
+				  	{name: 'Search Fakku', value: 3}]
+
+	}], function(answers)
+	{
+		if(answers.mainMenu == 1)
+		{
+			var page = 1;
+
+			utils.getNewest(page);
+
+		} else if (answers.mainMenu == 2) {
+
+			utils.initGetByTag()
+
+		} else if (answers.mainMenu == 3) {
+
+			var page, query;
+
+			page = 1;
+
+			inquirer.prompt([{
+
+				type: 'input',
+				message: 'input sarch keyword',
+				name: 'search'
+
+			}], function(answers)
+			{
+
+				utils.searchManga(answers.search, page);
+			})
+
+		}
+	})
+}
+
 utils.searchManga = function(query, pages, prevMangas)
 {
 	console.log('searching with "%s" keyword'.info, query)
@@ -315,6 +409,8 @@ utils.searchManga = function(query, pages, prevMangas)
 		if(err)
 		{
 			console.log(err)
+
+			console.log(api + '/search/' + query + '/page/' + pages)		
 
 			return false;
 		}

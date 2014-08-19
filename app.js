@@ -13,6 +13,7 @@ var changeCase	= require('change-case');
 var utils		= require('./utils')
 var async		= require('async')
 var archiver	= require('archiver')
+var shell		= require('shelljs');
 var args		= require('minimist')(process.argv.slice(2));
 
 var api			= 'https://api.fakku.net'
@@ -40,18 +41,7 @@ if(args._)
 	})
 }
 
-if(args.news)
-{
-	var page = 1;
-
-	if(args.page && typeof args.page !== 'boolean')
-	{
-		page = args.page;
-	}
-
-	utils.getNewest(page);
-
-} else if (args.dowmloaded || args.D) {
+if (args.dowmloaded || args.D) {
 
 	var query = args.dowmloaded || args.D;
 
@@ -92,79 +82,6 @@ if(args.news)
 			}
 		})
 	})
-
-} else if (args.tags || args.T) {
-
-	var query = args.tags || args.T;
-
-	if(typeof query == 'boolean' && query)
-	{
-		query = '*';
-	}
-
-	console.log('requesting information from %s'.info, api + '/tags')
-
-	request(api + '/tags', function(err, res, body)
-	{
-		if(err)
-		{
-			console.log(err)
-
-			return false;
-		}
-
-		var data = JSON.parse(body);
-
-		var choices = [];
-
-		__.each(data.tags, function(value, key, lists)
-		{
-			var temp = {};
-
-			temp.name = value.tag_name
-
-			temp.value = value
-
-			choices.push(temp)
-		})
-
-		inquirer.prompt([{
-
-			type: 'list',
-			message: 'Filter Manga by tags',
-			name: 'tags',
-			choices: choices
-
-		}], function(answers){
-
-			var page = 1;
-
-			if(args.page && typeof args.page !== 'boolean')
-			{
-				page = args.page;
-			}
-
-			utils.getByTags(answers.tags.tag_name.toString().toLowerCase(), page);
-		})
-	})
-
-} else if (args.search || args.S) {
-
-	var query = args.search || args.S;
-
-	if(typeof query == 'boolean' && query)
-	{
-		query = '';
-	}
-
-	var page = 1;
-
-	if(args.page && typeof args.page !== 'boolean')
-	{
-		page = args.page;
-	}
-
-	utils.searchManga(query, page);
 
 } else if (args.build || args.B) {
 
@@ -229,16 +146,33 @@ if(args.news)
 
 		async.series(que);
 	})
+
+} else {
+
+	utils.mainMenu(true)
+
 }
 
-process.on('uncaughtException', function (err) {
-  console.log('Caught exception: ' + err);
-});
+// process.stdin.resume();//so the program will not close instantly
 
-setTimeout(function () {
-  // console.log('This will still run.');
-}, 500);
+// function exitHandler(options, err) 
+// {
+//     if (options.cleanup) 
+//     {
+//     	utils.mainMenu(false)
+//     	process.stdin.resume();
+//     	return
+//     }
 
-// Intentionally cause an exception, but don't catch it.
-nonexistentFunc();
-// console.log('This will not run.');
+//     if (err) console.log(err.stack);
+//     if (options.exit) process.exit();
+// }
+
+// //do something when app is closing
+// process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+// //catches ctrl+c event
+// process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+// //catches uncaught exceptions
+// process.on('uncaughtException', exitHandler.bind(null, {exit:true}));

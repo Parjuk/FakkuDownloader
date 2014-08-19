@@ -9,6 +9,10 @@ Download From fakku via command line
  - Downloaded manga stored in folder downloads
 
 # Change Logs
+ - v0.5
+   - remove require of parameter to run app
+   - add main menu for easy use
+
  - v0.4
    - fix pagination bug
    - add --build command
@@ -30,6 +34,7 @@ Download From fakku via command line
 
 # TODO
  - give proper instruction to install and use this application
+ - create singe .exe app for more easier to use app
  - add option for --build command, so you can choose what manga you want to build into .cbr
  - add info for downloaded manga ( artist, translator, total pages, tags, etc )
  - remove downloaded manga
